@@ -1,0 +1,57 @@
+{
+  "_links": {
+    "root": {
+      "href": "/"
+    },
+    "self": {
+      "href": "/scans/ef69fb2f-beb2-414a-b87a-1efc06186467/findings"
+    },
+    "help": {
+      "href": "https://help.veracode.com/reader/tS9CaFwL4_lbIEWWomsJoA/ovfZGgu96UINQxIuTqRDwg"
+    }
+  },
+  "scan_id": "ef69fb2f-beb2-414a-b87a-1efc06186467",
+  "scan_status": "SUCCESS",
+  "message": "Scan successful. Results size: 3954 bytes",
+  "modules": [
+    "pipeline-scan.jar"
+  ],
+  "modules_count": 1,
+  "findings": [
+    {
+      "title": "exit",
+      "issue_id": 1000,
+      "gob": "B",
+      "severity": 2,
+      "issue_type_id": "guide",
+      "issue_type": "J2EE Bad Practices: Use of System.exit()",
+      "cwe_id": "382",
+      "display_text": "\u003cspan\u003eA J2EE application should not attempt to shut down its container.  A call to System.exit() is probably part of leftover debug code or code imported from a non-J2EE application.  Non-web applications may contain a main() method that calls System.exit(), but generally should not call it from other locations in the code.\u003c/span\u003e \u003cspan\u003eEnsure that System.exit() is never called by web applications.\u003c/span\u003e \u003cspan\u003eReferences: \u003ca href\u003d\"https://cwe.mitre.org/data/definitions/382.html\"\u003eCWE\u003c/a\u003e\u003c/span\u003e",
+      "files": {
+        "source_file": {
+          "file": "com/veracode/greenlight/tools/scanner/Main.java",
+          "line": 103,
+          "function_name": "run",
+          "qualified_function_name": "com.veracode.greenlight.tools.scanner.Main$1.run",
+          "function_prototype": "void run()",
+          "scope": "com.veracode.greenlight.tools.scanner.Main$1"
+        }
+      },
+      "flaw_match": {
+        "procedure_hash": "1121203122",
+        "prototype_hash": "4146034803",
+        "flaw_hash": "1728330308",
+        "flaw_hash_count": 1,
+        "flaw_hash_ordinal": 1,
+        "cause_hash": "2866949028",
+        "cause_hash_count": 1,
+        "cause_hash_ordinal": 1,
+        "cause_hash2": "0",
+        "cause_hash2_ordinal": "0"
+      },
+      "flaw_details_link": "https://downloads.veracode.com/securityscan/cwe/v4/java/382.html"
+    }
+  ],
+  "pipeline_scan": "21.10.1-0",
+  "dev_stage": "DEVELOPMENT"
+}
