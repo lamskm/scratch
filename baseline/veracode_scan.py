@@ -71,6 +71,7 @@ def initiate_scan():
         exit(4)
         
     cmd = "mkdir /tmp/veracode.pipeline; cd /tmp/veracode.pipeline; wget https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip; unzip pipeline-scan-LATEST.zip; cd -"
+    cmd = "mkdir -p /tmp/veracode.pipeline; rm -rf /tmp/veracode.pipeline/*; cd /tmp/veracode.pipeline; wget https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip; unzip pipeline-scan-LATEST.zip; cd -"
     print("Executing:"+cmd)
     os.system(cmd)
 
@@ -98,6 +99,9 @@ def initiate_scan():
             # Use baselineUrl's basename to create baseline file
             #
             baselineBasename=os.path.basename(baselineUrl)
+            jsonIdx = baselneBasename.rfind(".json")
+            if jsonIdx >= 0:
+                baselineBasename = baselneBasename[0:jsonIdx+5]
             cmd = "wget "+baselineUrl+" -O/tmp/veracode.pipeline/" + baselineBasename
             print("Executing:"+cmd)
             os.system(cmd)
@@ -113,7 +117,7 @@ def initiate_scan():
         cmd = "cp "+findings+" /tmp/canaveral_logs"
         print("Executing:"+cmd)
         os.system(cmd)
-        
+
 
 if __name__ == "__main__":
     initiate_scan()
