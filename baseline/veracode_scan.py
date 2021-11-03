@@ -110,9 +110,9 @@ def initiate_scan():
             # Use baselineUrl's basename to create baseline file
             #
             baselineBasename=os.path.basename(baselineUrl)
-            jsonIdx = baselneBasename.rfind(".json")
+            jsonIdx = baselineBasename.rfind(".json")
             if jsonIdx >= 0:
-                baselineBasename = baselneBasename[0:jsonIdx+5]
+                baselineBasename = baselineBasename[0:jsonIdx+5]
             cmd = "wget "+baselineUrl+" -O/tmp/veracode.pipeline/" + baselineBasename
             print("Executing:"+cmd)
             os.system(cmd)
