@@ -41,19 +41,16 @@ def initiate_scan():
     veracode_opts = []
     veracode_targets = []
 
-    if "VERACODE_OPTS" in os.environ:
-        veracode_opts.append(os.environ["VERACODE_OPTS"])
-
     if os.environ.get("ENABLE_SECURITY_SCAN", "0") != "1":
         logger.info(
             "Security scan was not enabled, try setting ENABLE_SECURITY_SCAN=1 if wanted"
         )
-        return False, [], veracode_opts
-
-    workspace_adapter = get_workspace_adapter()
+        return False, False, False
 
     logger.info("Security scan enabled, running")
     logger.info("Setting up BRANCH_TAG, VERSION, and PROJECT")
+
+    workspace_adapter = get_workspace_adapter()
 
     scan_branch_tag = _get_scan_branch_tag(workspace_adapter)
     version = f"{scan_branch_tag}:{workspace_adapter.build_identifier}"
@@ -63,12 +60,26 @@ def initiate_scan():
         f"Setup scan branch tag as {scan_branch_tag} and version: {version}, project: {project}"
     )
 
+    if "VERACODE_API_ID" in os.environ:
+        veracode_api_id = (os.environ["VERACODE_API_ID"])
+        print("VERACODE_API_ID="+veracode_api_id)
+    else:
+        print("VERACODE_API_ID not set, exiting...")
+        return False, False, False
+
+    if "VERACODE_API_KEY" in os.environ:
+        veracode_api_key = (os.environ["VERACODE_API_KEY"])
+        print("VERACODE_API_KEY="+veracode_api_key)
+    else:
+        print("VERACODE_API_KEY not set, exiting...")
+        return False, False, False
+
     if "VERACODE_TARGETS" in os.environ:
         veracode_targets = (os.environ["VERACODE_TARGETS"]).split()
         print("VERACODE_TARGETS="+str(veracode_targets))
     else:
         print("VERACODE_TARGETS not set, exiting...")
-        exit(4)
+        return False, False, False
         
     cmd = "mkdir /tmp/veracode.pipeline; cd /tmp/veracode.pipeline; wget https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip; unzip pipeline-scan-LATEST.zip; cd -"
     cmd = "mkdir -p /tmp/veracode.pipeline; rm -rf /tmp/veracode.pipeline/*; cd /tmp/veracode.pipeline; wget https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip; unzip pipeline-scan-LATEST.zip; cd -"
@@ -99,25 +110,26 @@ def initiate_scan():
             # Use baselineUrl's basename to create baseline file
             #
             baselineBasename=os.path.basename(baselineUrl)
-            jsonIdx = baselineBasename.rfind(".json")
+            jsonIdx = baselneBasename.rfind(".json")
             if jsonIdx >= 0:
-                baselineBasename = baselineBasename[0:jsonIdx+5]
+                baselineBasename = baselneBasename[0:jsonIdx+5]
             cmd = "wget "+baselineUrl+" -O/tmp/veracode.pipeline/" + baselineBasename
             print("Executing:"+cmd)
             os.system(cmd)
-            cmd = "java -jar /tmp/veracode.pipeline/pipeline-scan.jar --veracode_api_id 14a6752b394649dd07132a07b123a23d --veracode_api_key d93f6dd2284205f71a4bf4625fcce84e1f5eb5d324b489bee46b29a720c7752e420444639e1ce11ed3a8fc5ef5f098fd409abe04488b18ed52ee4ef0b0c8b9cd --file " + targetfile + " -jf " + findings + " -bf /tmp/veracode.pipeline/" + baselineBasename
+            cmd = "java -jar /tmp/veracode.pipeline/pipeline-scan.jar --veracode_api_id " + veracode_api_id + " --veracode_api_key " + veracode_api_key + " --file " + targetfile + " -jf " + findings + " -bf /tmp/veracode.pipeline/" + baselineBasename
             print("Executing:"+cmd)
             os.system(cmd)
         else:
             findings = target[colonIdx+1:]
             print("findings="+findings)
-            cmd = "java -jar /tmp/veracode.pipeline/pipeline-scan.jar --veracode_api_id 14a6752b394649dd07132a07b123a23d --veracode_api_key d93f6dd2284205f71a4bf4625fcce84e1f5eb5d324b489bee46b29a720c7752e420444639e1ce11ed3a8fc5ef5f098fd409abe04488b18ed52ee4ef0b0c8b9cd --file " + targetfile + " -jf " + findings
+            cmd = "java -jar /tmp/veracode.pipeline/pipeline-scan.jar --veracode_api_id " + veracode_api_id + " --veracode_api_key " + veracode_api_key + " --file " + targetfile + " -jf " + findings
             print("Executing:"+cmd)
             os.system(cmd)
         cmd = "cp "+findings+" /tmp/canaveral_logs"
         print("Executing:"+cmd)
         os.system(cmd)
 
+    return veracode_api_id, veracode_api_key, veracode_targets
 
 if __name__ == "__main__":
     initiate_scan()
